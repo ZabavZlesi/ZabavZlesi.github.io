@@ -21,7 +21,7 @@ let currentSelected = CELL_TYPE.WALL;
 let selectedButton = 0;
 
 let player = {
-    x: 0, 
+    x: 0,
     y: 0
 };
 
@@ -29,6 +29,38 @@ let target = {
     x: GRID_SIZE.x - 1,
     y: GRID_SIZE.y - 1
 };
+
+const HELP_MESSAGE =
+    `С цъкане се поставя избраното в цъкнатата клетка. Избраното се сменя с:
+(натисни ОК)
+`;
+
+const HELP_MESSAGE_KEYS =
+    `* 1 - път
+* 2 - стена
+* 3 - врата
+* 4, 5, 6, 7, 8, 9 - различни цветове копчета
+* P - играча
+* T - целта
+* E - копира линк за нивото
+(натисни ОК)
+`;
+
+const HELP_MESSAGE_DOORS =
+    `Когато се поставя врата се появява прозорец за въвеждане на булев израз за отваряне.
+В него се използват английските думи за цветовете на бутоните и логическите оператори.
+Например ако искам вратата да се отвори, когато е натиснат зеления бутон и не е натиснат
+червения, булевият израз е следният:
+green && !red
+`;
+
+const HELP_MESSAGE_DOOR_DIAL =
+    `Въведи булев израз за тази врата.
+Използват се цветовете на бутоните: black, yellow, red, green, red, blue, pink. Може да се използват и кръгли скоби и булевите оператори: 
+* && - И (AND)
+* || - ИЛИ (OR)
+* ^ - ИЗКЛЮЧВАЩО ИЛИ (XOR)
+* ! - ОТРИЦАНИЕ (NOT)`;
 
 class Cell {
     constructor(type, gridX, gridY) {
@@ -133,7 +165,7 @@ function draw() {
 
     cellSize = Math.min(
         canvas.width / GRID_SIZE.x,
-        canvas.height / GRID_SIZE.y
+        canvas.height / (GRID_SIZE.y + 1)
     );
 
     context.strokeStyle = "#000000";
@@ -161,10 +193,20 @@ function draw() {
         cellSize - GRID_DELIMITER_SIZE,
         cellSize - GRID_DELIMITER_SIZE
     );
+
+    context.fillStyle = "black";
+    context.font = cellSize / 2 + "px monospace";
+    context.fillText("Натисни \"H\" за помощ", cellSize / 4, canvas.height - cellSize / 1.5);
 }
+
 function mouseup() {
     let gridX = Math.floor(mouseX / cellSize);
     let gridY = Math.floor(mouseY / cellSize);
+
+    if (gridX < 0 || gridX >= GRID_SIZE.x ||
+        gridY < 0 || gridY >= GRID_SIZE.y) {
+        return;
+    }
 
     switch (currentSelected) {
         case CELL_TYPE.PATH: {
@@ -178,7 +220,7 @@ function mouseup() {
         }
 
         case CELL_TYPE.DOOR: {
-            let expression = prompt("Въведи булев израз за тази врата", grid[gridX][gridY].expression);
+            let expression = prompt(HELP_MESSAGE_DOOR_DIAL, grid[gridX][gridY].expression);
             grid[gridX][gridY] = new Door(gridX, gridY, expression);
             break;
         }
@@ -188,6 +230,25 @@ function mouseup() {
                 grid[gridX][gridY].id == selectedButton) {
                 grid[gridX][gridY].isOn ^= true;
             } else {
+                let samePos = {
+                    x: -1,
+                    y: -1
+                };
+
+                for (let i = 0; i < GRID_SIZE.x; i++) {
+                    for (let j = 0; j < GRID_SIZE.y; j++) {
+                        if (grid[i][j].id == selectedButton) {
+                            samePos.x = i;
+                            samePos.y = j;
+                            break;
+                        }
+                    }
+                }
+
+                if (samePos.x != -1) {
+                    grid[samePos.x][samePos.y] = new Path(samePos.x, samePos.y);
+                }
+
                 grid[gridX][gridY] = new Button(gridX, gridY, selectedButton);
             }
             break;
@@ -230,6 +291,13 @@ function keyup(key) {
         currentSelected = "PLAYER";
     } else if (key == 84) { // Натиснато 'T'
         currentSelected = "TARGET";
+    } else if (key == 69) { // Натиснато 'E'
+        navigator.clipboard.writeText(serialize());
+        alert("Линкът за нивото е копиран. Изплозвай Ctrl+V за да го поставиш някъде");
+    } else if (key == 72) { // Натиснато 'H'
+        alert(HELP_MESSAGE);
+        alert(HELP_MESSAGE_KEYS);
+        alert(HELP_MESSAGE_DOORS);
     }
 }
 
@@ -256,8 +324,9 @@ function serialize() {
             }
         }
     }
-    
-    return "?grid=" + encodeURIComponent(JSON.stringify(grid)) +
-           "&player=" + encodeURIComponent(JSON.stringify(player)) + 
-           "&target=" + encodeURIComponent(JSON.stringify(target));
+
+    return "http://zabavzlesi.github.io/game/start.html" +
+        "?grid=" + encodeURIComponent(JSON.stringify(grid)) +
+        "&player=" + encodeURIComponent(JSON.stringify(player)) +
+        "&target=" + encodeURIComponent(JSON.stringify(target));
 }
