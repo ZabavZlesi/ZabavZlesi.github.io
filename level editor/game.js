@@ -165,7 +165,7 @@ function draw() {
 
     cellSize = Math.min(
         canvas.width / GRID_SIZE.x,
-        canvas.height / (GRID_SIZE.y + 1)
+        canvas.height / (GRID_SIZE.y + 2)
     );
 
     context.strokeStyle = "#000000";
@@ -196,7 +196,70 @@ function draw() {
 
     context.fillStyle = "black";
     context.font = cellSize / 2 + "px monospace";
-    context.fillText("Натисни \"H\" за помощ", cellSize / 4, canvas.height - cellSize / 1.5);
+    context.fillText("Избрано: ", cellSize / 4, canvas.height - cellSize - cellSize / 1.7);
+    switch (currentSelected) {
+        case CELL_TYPE.WALL:
+            drawImage(
+                powerupRed,
+                5.75 * cellSize / 2,
+                canvas.height - 1.6 * cellSize,
+                cellSize / 2,
+                cellSize / 2
+            );
+            break;
+
+        case CELL_TYPE.PATH:
+            drawImage(
+                powerupGreen,
+                5.75 * cellSize / 2,
+                canvas.height - 1.6 * cellSize,
+                cellSize / 2,
+                cellSize / 2
+            );
+            break;
+
+        case CELL_TYPE.DOOR:
+            drawImage(
+                powerupYellowShield,
+                5.75 * cellSize / 2,
+                canvas.height - 1.6 * cellSize,
+                cellSize / 2,
+                cellSize / 2
+            );
+            break;
+
+        case CELL_TYPE.BUTTON:
+            drawImage(
+                jelly[selectedButton],
+                5.75 * cellSize / 2,
+                canvas.height - 1.6 * cellSize,
+                cellSize / 2,
+                cellSize / 2
+            );
+            break;
+
+        case "PLAYER":
+            drawImage(
+                flyMan,
+                5.75 * cellSize / 2,
+                canvas.height - 1.6 * cellSize,
+                cellSize / 2,
+                cellSize / 2
+            );
+            break;
+
+        case "TARGET":
+            drawImage(
+                ballOrTarget,
+                5.75 * cellSize / 2,
+                canvas.height - 1.6 * cellSize,
+                cellSize / 2,
+                cellSize / 2
+            );
+            break;
+    }
+
+    context.fillText("Натисни \"H\" за помощ.", cellSize / 4, canvas.height - cellSize / 1.3);
 }
 
 function mouseup() {
