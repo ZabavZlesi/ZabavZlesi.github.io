@@ -50,11 +50,11 @@ downButton.onclick = () => {
 
 elementType = "p";
 
-for (let i = 0; i < 100; i++){
-  for (let j = 0; j < 100; j++){
-    sOImage("kot", i,j, 100, 100)
-  }
-}
+// for (let i = 0; i < 100; i++){
+//   for (let j = 0; j < 100; j++){
+//     sOImage("kot", i,j, 100, 100)
+//   }
+// }
 
 function update() {
   key = inputKey.value
