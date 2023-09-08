@@ -325,7 +325,7 @@ function serialize() {
         }
     }
 
-    return "http://zabavzlesi.github.io/game/start.html" +
+    return "http://zabavzlesi.github.io/logika/game/start.html" +
         "?grid=" + encodeURIComponent(JSON.stringify(grid)) +
         "&player=" + encodeURIComponent(JSON.stringify(player)) +
         "&target=" + encodeURIComponent(JSON.stringify(target));
